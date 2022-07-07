@@ -1,0 +1,23 @@
+services:
+  app:
+    build: 
+      context: .
+    container_name: app
+    volumes:
+      - ./:/app
+    ports:
+      - "8080:8080"
+    env_file: ./secret.env
+    command: reflex -r '(\.go$$)' -s go run cmd/main.go
+    
+  postgres:
+    image: postgres:latest
+    ports: 
+      - "5432:5432"
+    container_name: postgres14
+    environment:
+      - POSTGRES_DB=secretaria
+      - POSTGRES_USER=smarchz
+      - TZ='GMT+7'
+      - PGTZ='GMT+7'
+    env_file: ./secret.env

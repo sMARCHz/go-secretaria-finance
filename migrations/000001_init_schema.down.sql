@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS categories;
+
+DROP TABLE IF EXISTS transfers;
+
+DROP TABLE IF EXISTS accounts;
+
+DROP TYPE currency;
+
+DROP TABLE IF EXISTS entries;

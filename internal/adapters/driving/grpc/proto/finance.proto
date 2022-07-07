@@ -1,0 +1,96 @@
+syntax = "proto3";
+option go_package = "./pb";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service FinanceService {
+    rpc Withdraw(TransactionRequest) returns (TransactionResponse){}
+    rpc Deposit(TransactionRequest) returns (TransactionResponse){}
+    rpc Transfer(TransferRequest) returns (TransferResponse){}
+    rpc GetBalance(google.protobuf.Empty) returns (Balance){}
+    rpc GetOverviewMonthlyStatement(google.protobuf.Empty) returns (OverviewStatement){}
+    rpc GetOverviewAnnualStatement(google.protobuf.Empty) returns (OverviewStatement){}
+}
+
+// Transaction
+message TransactionRequest {
+    string account = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    string category = 3;
+    string description = 4;
+    double amount = 5;
+}
+
+message TransactionResponse {
+    int32 status = 1;
+    string error = 2;
+    double balance = 3;
+}
+
+// Transfer
+message TransferRequest {
+    string from = 1;
+    string to = 2;
+    string description = 3;
+    double amount = 4;
+}
+
+message TransferResponse {
+    int32 status = 1;
+    string error = 2;
+    string from = 3;
+    double balance = 4;
+}
+
+// Balance
+message Balance {
+    int32 status = 1;
+    string error = 2;
+    repeated AccountBalance balance = 3;
+}
+
+message AccountBalance {
+    string account = 1;
+    double amount = 2;
+}
+
+// Overview Statement
+message OverviewStatement {
+    int32 status = 1;
+    string error = 2;
+    OverviewStatmentSection revenue = 3;
+    OverviewStatmentSection expense = 4;
+    double profit = 5;
+}
+
+message OverviewStatmentSection {
+    double total = 1;
+    repeated CategorizedEntries list = 2;
+}
+
+message CategorizedEntries {
+    string category = 1;
+    double amount = 2;
+}
+
+// Detailed Statement
+message DetailedStatement {
+    int32 status = 1;
+    string error = 2;
+    DetailedStatmentSection revenue = 3;
+    DetailedStatmentSection expense = 4;
+    double profit = 5;
+}
+
+message DetailedStatmentSection {
+    double total = 1;
+    repeated Entries entries = 2;
+}
+
+message Entries {
+    google.protobuf.Timestamp timestamp = 1;
+    string category = 2;
+    string description = 3;
+    double amount = 4;
+}
