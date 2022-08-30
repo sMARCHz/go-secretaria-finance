@@ -4,17 +4,42 @@ import (
 	"context"
 
 	"github.com/sMARCHz/go-secretaria-finance/internal/adapters/driving/grpc/pb"
+	"github.com/sMARCHz/go-secretaria-finance/internal/core/dto"
 	"github.com/sMARCHz/go-secretaria-finance/internal/core/services"
+	"github.com/sMARCHz/go-secretaria-finance/internal/logger"
+	"github.com/sMARCHz/go-secretaria-finance/internal/utils"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type financeServiceServer struct {
 	service services.FinanceService
+	logger  logger.Logger
 	pb.UnimplementedFinanceServiceServer
 }
 
+func newFinanceServiceServer(service services.FinanceService, logger logger.Logger) financeServiceServer {
+	return financeServiceServer{
+		service: service,
+		logger:  logger,
+	}
+}
+
 func (f financeServiceServer) Withdraw(ctx context.Context, r *pb.TransactionRequest) (*pb.TransactionResponse, error) {
-	return nil, nil
+	req := dto.TransactionRequest{
+		AccountName: r.AccountName,
+		Category:    r.Category,
+		Description: r.Description,
+		Amount:      r.Amount,
+		CreatedAt:   r.Timestamp.AsTime(),
+	}
+	response, err := f.service.Withdraw(req)
+	pbResponse := response.ToProto()
+	if err != nil {
+		pbResponse.Status = int32(err.StatusCode)
+		pbResponse.Error = err.Message
+		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+	}
+	return pbResponse, nil
 }
 
 func (f financeServiceServer) Deposit(ctx context.Context, r *pb.TransactionRequest) (*pb.TransactionResponse, error) {

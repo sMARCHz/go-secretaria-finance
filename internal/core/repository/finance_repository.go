@@ -1,18 +1,12 @@
 package repository
 
 import (
-	"github.com/jmoiron/sqlx"
+	"github.com/sMARCHz/go-secretaria-finance/internal/core/domain"
+	"github.com/sMARCHz/go-secretaria-finance/internal/core/errors"
 )
 
 type FinanceRepository interface {
-}
-
-type financeRepository struct {
-	db *sqlx.DB
-}
-
-func NewFinanceRepository(db *sqlx.DB) financeRepository {
-	return financeRepository{
-		db: db,
-	}
+	Withdraw(domain.Transaction) (domain.Account, *errors.AppError)
+	GetAccountIDByName(string) (int, *errors.AppError)
+	GetCategoryIDByAbbrName(string) (int, *errors.AppError)
 }

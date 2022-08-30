@@ -5,9 +5,9 @@ import (
 	"net"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/sMARCHz/go-secretaria-finance/internal/adapters/driven/db"
 	"github.com/sMARCHz/go-secretaria-finance/internal/adapters/driving/grpc/pb"
 	"github.com/sMARCHz/go-secretaria-finance/internal/config"
-	"github.com/sMARCHz/go-secretaria-finance/internal/core/repository"
 	"github.com/sMARCHz/go-secretaria-finance/internal/core/services"
 	"github.com/sMARCHz/go-secretaria-finance/internal/logger"
 	"google.golang.org/grpc"
@@ -33,9 +33,9 @@ func NewGRPCServer(config config.AppConfiguration, logger logger.Logger, db *sql
 
 func (g GRPCServer) Start() {
 	// wiring
-	fRepo := repository.NewFinanceRepository(g.database)
+	fRepo := db.NewFinanceRepository(g.database, g.logger)
 	fService := services.NewFinanceService(fRepo)
-	fServer := financeServiceServer{service: fService}
+	fServer := newFinanceServiceServer(fService, g.logger)
 
 	grpcServer := g.server
 	logger := g.logger
