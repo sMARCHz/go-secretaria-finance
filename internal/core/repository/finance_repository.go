@@ -11,5 +11,5 @@ type FinanceRepository interface {
 	GetAllAccountBalance() ([]domain.Account, *errors.AppError)
 
 	GetAccountIDByName(string) (int, *errors.AppError)
-	GetCategoryIDByAbbrName(string) (int, *errors.AppError)
+	GetCategoryIDByAbbrNameAndTransactionType(string, string) (int, *errors.AppError)
 }

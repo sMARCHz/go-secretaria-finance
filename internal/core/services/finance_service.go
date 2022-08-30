@@ -29,12 +29,12 @@ func NewFinanceService(repo repository.FinanceRepository) FinanceService {
 }
 
 func (f financeService) Withdraw(req dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError) {
-	accountID, err := f.repository.GetAccountIDByName(req.AccountName)
+	categoryID, err := f.repository.GetCategoryIDByAbbrNameAndTransactionType(req.Category, "WITHDRAW")
 	if err != nil {
 		return dto.TransactionResponse{}, err
 	}
 
-	categoryID, err := f.repository.GetCategoryIDByAbbrName(req.Category)
+	accountID, err := f.repository.GetAccountIDByName(req.AccountName)
 	if err != nil {
 		return dto.TransactionResponse{}, err
 	}
@@ -54,12 +54,12 @@ func (f financeService) Withdraw(req dto.TransactionRequest) (dto.TransactionRes
 }
 
 func (f financeService) Deposit(req dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError) {
-	accountID, err := f.repository.GetAccountIDByName(req.AccountName)
+	categoryID, err := f.repository.GetCategoryIDByAbbrNameAndTransactionType(req.Category, "DEPOSIT")
 	if err != nil {
 		return dto.TransactionResponse{}, err
 	}
 
-	categoryID, err := f.repository.GetCategoryIDByAbbrName(req.Category)
+	accountID, err := f.repository.GetAccountIDByName(req.AccountName)
 	if err != nil {
 		return dto.TransactionResponse{}, err
 	}

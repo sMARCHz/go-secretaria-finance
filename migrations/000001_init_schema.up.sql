@@ -3,6 +3,12 @@ CREATE TYPE "currency" AS ENUM (
   'THB'
 );
 
+CREATE TYPE "transaction_type" AS ENUM (
+  'WITHDRAW',
+  'DEPOSIT',
+  'TRANSFER'
+);
+
 CREATE TABLE "accounts" (
   "account_id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
@@ -24,6 +30,7 @@ CREATE TABLE "categories" (
   "category_id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
   "name_abbr" varchar NOT NULL,
+  "transaction_type" transaction_type NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 

@@ -36,12 +36,12 @@ func (f financeRepository) GetAccountIDByName(name string) (int, *errors.AppErro
 	return accountID, nil
 }
 
-func (f financeRepository) GetCategoryIDByAbbrName(categoryAbbrName string) (int, *errors.AppError) {
+func (f financeRepository) GetCategoryIDByAbbrNameAndTransactionType(categoryAbbrName string, transactionType string) (int, *errors.AppError) {
 	var categoryID int
-	err := f.db.Get(&categoryID, "SELECT category_id FROM categories WHERE name_abbr = $1 LIMIT 1", categoryAbbrName)
+	err := f.db.Get(&categoryID, "SELECT category_id FROM categories WHERE name_abbr = $1 AND transaction_type = $2 LIMIT 1", categoryAbbrName, transactionType)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			f.logger.Errorf("category not found where abbreviation='%v'", categoryAbbrName)
+			f.logger.Errorf("category not found where abbreviation='%v', transactionType='%v'", categoryAbbrName, transactionType)
 			return -1, errors.NotFoundError("category not found")
 		}
 		f.logger.Error("failed to get categoryID: ", err)
