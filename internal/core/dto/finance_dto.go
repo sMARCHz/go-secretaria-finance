@@ -32,10 +32,10 @@ type BalanceResponse struct {
 	Balance     float64 `json:"balance"`
 }
 
-func (t BalanceResponse) ToProto() *pb.AccountBalance {
+func (b BalanceResponse) ToProto() *pb.AccountBalance {
 	response := pb.AccountBalance{
-		AccountName: t.AccountName,
-		Balance:     t.Balance,
+		AccountName: b.AccountName,
+		Balance:     b.Balance,
 	}
 	return &response
 }
