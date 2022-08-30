@@ -6,7 +6,7 @@ CREATE TYPE "currency" AS ENUM (
 CREATE TABLE "accounts" (
   "account_id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
-  "balance" float8 NOT NULL,
+  "balance" decimal NOT NULL,
   "currency" currency NOT NULL DEFAULT 'THB',
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
@@ -15,7 +15,7 @@ CREATE TABLE "entries" (
   "entry_id" bigserial PRIMARY KEY,
   "account_id" int NOT NULL,
   "category_id" int NOT NULL,
-  "amount" float8 NOT NULL,
+  "amount" decimal NOT NULL,
   "description" varchar,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
@@ -31,7 +31,7 @@ CREATE TABLE "transfers" (
   "transfer_id" bigserial PRIMARY KEY,
   "from_account_id" int NOT NULL,
   "to_account_id" int NOT NULL,
-  "amount" float8 NOT NULL,
+  "amount" decimal NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
