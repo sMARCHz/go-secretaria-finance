@@ -13,7 +13,7 @@ type FinanceService interface {
 	Withdraw(dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError)
 	Deposit()
 	Transfer()
-	GetBalance()
+	GetBalance() ([]dto.BalanceResponse, *errors.AppError)
 	GetOverviewMonthlyStatement()
 	GetOverviewAnnualStatement()
 }
@@ -61,8 +61,17 @@ func (f financeService) Transfer() {
 
 }
 
-func (f financeService) GetBalance() {
+func (f financeService) GetBalance() ([]dto.BalanceResponse, *errors.AppError) {
+	accounts, err := f.repository.GetAllAccountBalance()
+	if err != nil {
+		return nil, err
+	}
 
+	responses := make([]dto.BalanceResponse, len(accounts))
+	for i, v := range accounts {
+		responses[i] = v.ToBalanceResponseDto()
+	}
+	return responses, nil
 }
 
 func (f financeService) GetOverviewMonthlyStatement() {

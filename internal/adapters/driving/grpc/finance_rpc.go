@@ -50,8 +50,21 @@ func (f financeServiceServer) Transfer(ctx context.Context, r *pb.TransferReques
 	return nil, nil
 }
 
-func (f financeServiceServer) GetBalance(ctx context.Context, r *emptypb.Empty) (*pb.Balance, error) {
-	return nil, nil
+func (f financeServiceServer) GetBalance(ctx context.Context, r *emptypb.Empty) (*pb.GetBalanceResponse, error) {
+	response, err := f.service.GetBalance()
+
+	accountsBalance := make([]*pb.AccountBalance, len(response))
+	for i, v := range response {
+		accountsBalance[i] = v.ToProto()
+	}
+
+	pbResponse := &pb.GetBalanceResponse{Accounts: accountsBalance}
+	if err != nil {
+		pbResponse.Status = int32(err.StatusCode)
+		pbResponse.Error = err.Message
+		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+	}
+	return pbResponse, nil
 }
 
 func (f financeServiceServer) GetOverviewMonthlyStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatement, error) {

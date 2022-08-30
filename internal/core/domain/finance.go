@@ -30,6 +30,13 @@ func (a Account) ToTransactionResponseDto() dto.TransactionResponse {
 	}
 }
 
+func (a Account) ToBalanceResponseDto() dto.BalanceResponse {
+	return dto.BalanceResponse{
+		AccountName: a.Name,
+		Balance:     a.Balance,
+	}
+}
+
 type Entry struct {
 	EntryID     int            `db:"entry_id"`
 	AccountID   int            `db:"account_id"`

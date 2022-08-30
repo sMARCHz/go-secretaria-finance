@@ -26,3 +26,16 @@ func (t TransactionResponse) ToProto() *pb.TransactionResponse {
 	}
 	return &response
 }
+
+type BalanceResponse struct {
+	AccountName string  `json:"account_name"`
+	Balance     float64 `json:"balance"`
+}
+
+func (t BalanceResponse) ToProto() *pb.AccountBalance {
+	response := pb.AccountBalance{
+		AccountName: t.AccountName,
+		Balance:     t.Balance,
+	}
+	return &response
+}

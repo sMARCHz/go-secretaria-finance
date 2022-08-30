@@ -96,3 +96,12 @@ func (f financeRepository) Withdraw(t domain.Transaction) (domain.Account, *erro
 	}
 	return account, nil
 }
+
+func (f financeRepository) GetAllAccountBalance() ([]domain.Account, *errors.AppError) {
+	var accounts []domain.Account
+	if err := f.db.Select(&accounts, "SELECT name, balance FROM accounts"); err != nil {
+		f.logger.Error("failed to query accounts: ", err)
+		return nil, errors.InternalServerError("failed to get all balance of accounts")
+	}
+	return accounts, nil
+}

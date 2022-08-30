@@ -26,7 +26,7 @@ type FinanceServiceClient interface {
 	Withdraw(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionResponse, error)
 	Deposit(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionResponse, error)
 	Transfer(ctx context.Context, in *TransferRequest, opts ...grpc.CallOption) (*TransferResponse, error)
-	GetBalance(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Balance, error)
+	GetBalance(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetBalanceResponse, error)
 	GetOverviewMonthlyStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatement, error)
 	GetOverviewAnnualStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatement, error)
 }
@@ -66,8 +66,8 @@ func (c *financeServiceClient) Transfer(ctx context.Context, in *TransferRequest
 	return out, nil
 }
 
-func (c *financeServiceClient) GetBalance(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Balance, error) {
-	out := new(Balance)
+func (c *financeServiceClient) GetBalance(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetBalanceResponse, error) {
+	out := new(GetBalanceResponse)
 	err := c.cc.Invoke(ctx, "/FinanceService/GetBalance", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ type FinanceServiceServer interface {
 	Withdraw(context.Context, *TransactionRequest) (*TransactionResponse, error)
 	Deposit(context.Context, *TransactionRequest) (*TransactionResponse, error)
 	Transfer(context.Context, *TransferRequest) (*TransferResponse, error)
-	GetBalance(context.Context, *emptypb.Empty) (*Balance, error)
+	GetBalance(context.Context, *emptypb.Empty) (*GetBalanceResponse, error)
 	GetOverviewMonthlyStatement(context.Context, *emptypb.Empty) (*OverviewStatement, error)
 	GetOverviewAnnualStatement(context.Context, *emptypb.Empty) (*OverviewStatement, error)
 	mustEmbedUnimplementedFinanceServiceServer()
@@ -119,7 +119,7 @@ func (UnimplementedFinanceServiceServer) Deposit(context.Context, *TransactionRe
 func (UnimplementedFinanceServiceServer) Transfer(context.Context, *TransferRequest) (*TransferResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Transfer not implemented")
 }
-func (UnimplementedFinanceServiceServer) GetBalance(context.Context, *emptypb.Empty) (*Balance, error) {
+func (UnimplementedFinanceServiceServer) GetBalance(context.Context, *emptypb.Empty) (*GetBalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
 }
 func (UnimplementedFinanceServiceServer) GetOverviewMonthlyStatement(context.Context, *emptypb.Empty) (*OverviewStatement, error) {
