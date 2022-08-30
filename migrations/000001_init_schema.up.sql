@@ -5,7 +5,7 @@ CREATE TYPE "currency" AS ENUM (
 
 CREATE TABLE "accounts" (
   "account_id" bigserial PRIMARY KEY,
-  "name" int NOT NULL,
+  "name" varchar NOT NULL,
   "balance" float8 NOT NULL,
   "currency" currency NOT NULL DEFAULT 'THB',
   "created_at" timestamptz NOT NULL DEFAULT (now())
@@ -23,6 +23,7 @@ CREATE TABLE "entries" (
 CREATE TABLE "categories" (
   "category_id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
+  "name_abbr" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
@@ -43,6 +44,8 @@ CREATE INDEX ON "entries" ("category_id");
 CREATE INDEX ON "entries" ("account_id", "category_id");
 
 CREATE INDEX ON "categories" ("name");
+
+CREATE INDEX ON "categories" ("name_abbr");
 
 CREATE INDEX ON "transfers" ("from_account_id");
 
