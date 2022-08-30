@@ -7,6 +7,7 @@ import (
 
 type FinanceRepository interface {
 	Withdraw(domain.Transaction) (domain.Account, *errors.AppError)
+	Deposit(domain.Transaction) (domain.Account, *errors.AppError)
 	GetAllAccountBalance() ([]domain.Account, *errors.AppError)
 
 	GetAccountIDByName(string) (int, *errors.AppError)

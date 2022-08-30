@@ -11,7 +11,7 @@ import (
 
 type FinanceService interface {
 	Withdraw(dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError)
-	Deposit()
+	Deposit(dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError)
 	Transfer()
 	GetBalance() ([]dto.BalanceResponse, *errors.AppError)
 	GetOverviewMonthlyStatement()
@@ -53,8 +53,29 @@ func (f financeService) Withdraw(req dto.TransactionRequest) (dto.TransactionRes
 	return account.ToTransactionResponseDto(), nil
 }
 
-func (f financeService) Deposit() {
+func (f financeService) Deposit(req dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError) {
+	accountID, err := f.repository.GetAccountIDByName(req.AccountName)
+	if err != nil {
+		return dto.TransactionResponse{}, err
+	}
 
+	categoryID, err := f.repository.GetCategoryIDByAbbrName(req.Category)
+	if err != nil {
+		return dto.TransactionResponse{}, err
+	}
+
+	transaction := domain.Transaction{
+		AccountID:   accountID,
+		CategoryID:  categoryID,
+		Description: sql.NullString{String: req.Description},
+		Amount:      req.Amount,
+		CreatedAt:   req.CreatedAt,
+	}
+	account, err := f.repository.Deposit(transaction)
+	if err != nil {
+		return dto.TransactionResponse{}, err
+	}
+	return account.ToTransactionResponseDto(), nil
 }
 
 func (f financeService) Transfer() {

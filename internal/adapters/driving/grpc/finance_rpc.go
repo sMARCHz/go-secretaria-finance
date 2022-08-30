@@ -43,7 +43,21 @@ func (f financeServiceServer) Withdraw(ctx context.Context, r *pb.TransactionReq
 }
 
 func (f financeServiceServer) Deposit(ctx context.Context, r *pb.TransactionRequest) (*pb.TransactionResponse, error) {
-	return nil, nil
+	req := dto.TransactionRequest{
+		AccountName: r.AccountName,
+		Category:    r.Category,
+		Description: r.Description,
+		Amount:      r.Amount,
+		CreatedAt:   r.Timestamp.AsTime(),
+	}
+	response, err := f.service.Deposit(req)
+	pbResponse := response.ToProto()
+	if err != nil {
+		pbResponse.Status = int32(err.StatusCode)
+		pbResponse.Error = err.Message
+		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+	}
+	return pbResponse, nil
 }
 
 func (f financeServiceServer) Transfer(ctx context.Context, r *pb.TransferRequest) (*pb.TransferResponse, error) {
