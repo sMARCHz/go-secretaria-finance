@@ -68,10 +68,10 @@ message OverviewStatement {
 
 message OverviewStatmentSection {
     double total = 1;
-    repeated CategorizedEntries list = 2;
+    repeated CategorizedEntry entries = 2;
 }
 
-message CategorizedEntries {
+message CategorizedEntry {
     string category = 1;
     double amount = 2;
 }
@@ -87,10 +87,10 @@ message DetailedStatement {
 
 message DetailedStatmentSection {
     double total = 1;
-    repeated Entries entries = 2;
+    repeated Entry entries = 2;
 }
 
-message Entries {
+message Entry {
     google.protobuf.Timestamp timestamp = 1;
     string accountName = 2;
     string category = 3;
