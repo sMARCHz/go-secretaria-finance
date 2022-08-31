@@ -27,6 +27,26 @@ func (t TransactionResponse) ToProto() *pb.TransactionResponse {
 	return &response
 }
 
+type TransferRequest struct {
+	FromAccountName string  `json:"from_account"`
+	ToAccountName   string  `json:"to_account"`
+	Description     string  `json:"description"`
+	Amount          float64 `json:"amount"`
+}
+
+type TransferResponse struct {
+	FromAccountName    string  `json:"from_account"`
+	FromAccountBalance float64 `json:"balance"`
+}
+
+func (t TransferResponse) ToProto() *pb.TransferResponse {
+	response := pb.TransferResponse{
+		FromAccountName: t.FromAccountName,
+		Balance:         t.FromAccountBalance,
+	}
+	return &response
+}
+
 type BalanceResponse struct {
 	AccountName string  `json:"account_name"`
 	Balance     float64 `json:"balance"`

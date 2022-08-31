@@ -61,7 +61,20 @@ func (f financeServiceServer) Deposit(ctx context.Context, r *pb.TransactionRequ
 }
 
 func (f financeServiceServer) Transfer(ctx context.Context, r *pb.TransferRequest) (*pb.TransferResponse, error) {
-	return nil, nil
+	req := dto.TransferRequest{
+		FromAccountName: r.FromAccountName,
+		ToAccountName:   r.ToAccountName,
+		Description:     r.Description,
+		Amount:          r.Amount,
+	}
+	response, err := f.service.Transfer(req)
+	pbResponse := response.ToProto()
+	if err != nil {
+		pbResponse.Status = int32(err.StatusCode)
+		pbResponse.Error = err.Message
+		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+	}
+	return pbResponse, nil
 }
 
 func (f financeServiceServer) GetBalance(ctx context.Context, r *emptypb.Empty) (*pb.GetBalanceResponse, error) {

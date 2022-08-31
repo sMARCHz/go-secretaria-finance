@@ -30,6 +30,13 @@ func (a Account) ToTransactionResponseDto() dto.TransactionResponse {
 	}
 }
 
+func (a Account) ToTransferResponseDto() dto.TransferResponse {
+	return dto.TransferResponse{
+		FromAccountName:    a.Name,
+		FromAccountBalance: a.Balance,
+	}
+}
+
 func (a Account) ToBalanceResponseDto() dto.BalanceResponse {
 	return dto.BalanceResponse{
 		AccountName: a.Name,
@@ -54,9 +61,10 @@ type Category struct {
 }
 
 type Transfer struct {
-	TransferID    int       `db:"transfer_id"`
-	FromAccountID int       `db:"from_account_id"`
-	ToAccountID   int       `db:"to_account_id"`
+	TransferID    int `db:"transfer_id"`
+	FromAccountID int `db:"from_account_id"`
+	ToAccountID   int `db:"to_account_id"`
+	Description   sql.NullString
 	Amount        float64   `db:"amount"`
 	CreatedAt     time.Time `db:"created_at"`
 }
