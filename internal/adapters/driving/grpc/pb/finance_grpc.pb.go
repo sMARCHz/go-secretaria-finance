@@ -27,8 +27,9 @@ type FinanceServiceClient interface {
 	Deposit(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionResponse, error)
 	Transfer(ctx context.Context, in *TransferRequest, opts ...grpc.CallOption) (*TransferResponse, error)
 	GetBalance(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetBalanceResponse, error)
-	GetOverviewMonthlyStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatement, error)
-	GetOverviewAnnualStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatement, error)
+	GetOverviewStatement(ctx context.Context, in *OverviewStatmentRequest, opts ...grpc.CallOption) (*OverviewStatementResponse, error)
+	GetOverviewMonthlyStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatementResponse, error)
+	GetOverviewAnnualStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatementResponse, error)
 }
 
 type financeServiceClient struct {
@@ -75,8 +76,17 @@ func (c *financeServiceClient) GetBalance(ctx context.Context, in *emptypb.Empty
 	return out, nil
 }
 
-func (c *financeServiceClient) GetOverviewMonthlyStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatement, error) {
-	out := new(OverviewStatement)
+func (c *financeServiceClient) GetOverviewStatement(ctx context.Context, in *OverviewStatmentRequest, opts ...grpc.CallOption) (*OverviewStatementResponse, error) {
+	out := new(OverviewStatementResponse)
+	err := c.cc.Invoke(ctx, "/FinanceService/GetOverviewStatement", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *financeServiceClient) GetOverviewMonthlyStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatementResponse, error) {
+	out := new(OverviewStatementResponse)
 	err := c.cc.Invoke(ctx, "/FinanceService/GetOverviewMonthlyStatement", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -84,8 +94,8 @@ func (c *financeServiceClient) GetOverviewMonthlyStatement(ctx context.Context, 
 	return out, nil
 }
 
-func (c *financeServiceClient) GetOverviewAnnualStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatement, error) {
-	out := new(OverviewStatement)
+func (c *financeServiceClient) GetOverviewAnnualStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatementResponse, error) {
+	out := new(OverviewStatementResponse)
 	err := c.cc.Invoke(ctx, "/FinanceService/GetOverviewAnnualStatement", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -101,8 +111,9 @@ type FinanceServiceServer interface {
 	Deposit(context.Context, *TransactionRequest) (*TransactionResponse, error)
 	Transfer(context.Context, *TransferRequest) (*TransferResponse, error)
 	GetBalance(context.Context, *emptypb.Empty) (*GetBalanceResponse, error)
-	GetOverviewMonthlyStatement(context.Context, *emptypb.Empty) (*OverviewStatement, error)
-	GetOverviewAnnualStatement(context.Context, *emptypb.Empty) (*OverviewStatement, error)
+	GetOverviewStatement(context.Context, *OverviewStatmentRequest) (*OverviewStatementResponse, error)
+	GetOverviewMonthlyStatement(context.Context, *emptypb.Empty) (*OverviewStatementResponse, error)
+	GetOverviewAnnualStatement(context.Context, *emptypb.Empty) (*OverviewStatementResponse, error)
 	mustEmbedUnimplementedFinanceServiceServer()
 }
 
@@ -122,10 +133,13 @@ func (UnimplementedFinanceServiceServer) Transfer(context.Context, *TransferRequ
 func (UnimplementedFinanceServiceServer) GetBalance(context.Context, *emptypb.Empty) (*GetBalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
 }
-func (UnimplementedFinanceServiceServer) GetOverviewMonthlyStatement(context.Context, *emptypb.Empty) (*OverviewStatement, error) {
+func (UnimplementedFinanceServiceServer) GetOverviewStatement(context.Context, *OverviewStatmentRequest) (*OverviewStatementResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOverviewStatement not implemented")
+}
+func (UnimplementedFinanceServiceServer) GetOverviewMonthlyStatement(context.Context, *emptypb.Empty) (*OverviewStatementResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOverviewMonthlyStatement not implemented")
 }
-func (UnimplementedFinanceServiceServer) GetOverviewAnnualStatement(context.Context, *emptypb.Empty) (*OverviewStatement, error) {
+func (UnimplementedFinanceServiceServer) GetOverviewAnnualStatement(context.Context, *emptypb.Empty) (*OverviewStatementResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOverviewAnnualStatement not implemented")
 }
 func (UnimplementedFinanceServiceServer) mustEmbedUnimplementedFinanceServiceServer() {}
@@ -213,6 +227,24 @@ func _FinanceService_GetBalance_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FinanceService_GetOverviewStatement_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OverviewStatmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FinanceServiceServer).GetOverviewStatement(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/FinanceService/GetOverviewStatement",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FinanceServiceServer).GetOverviewStatement(ctx, req.(*OverviewStatmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _FinanceService_GetOverviewMonthlyStatement_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -271,6 +303,10 @@ var FinanceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBalance",
 			Handler:    _FinanceService_GetBalance_Handler,
+		},
+		{
+			MethodName: "GetOverviewStatement",
+			Handler:    _FinanceService_GetOverviewStatement_Handler,
 		},
 		{
 			MethodName: "GetOverviewMonthlyStatement",

@@ -9,8 +9,9 @@ service FinanceService {
     rpc Deposit(TransactionRequest) returns (TransactionResponse){}
     rpc Transfer(TransferRequest) returns (TransferResponse){}
     rpc GetBalance(google.protobuf.Empty) returns (GetBalanceResponse){}
-    rpc GetOverviewMonthlyStatement(google.protobuf.Empty) returns (OverviewStatement){}
-    rpc GetOverviewAnnualStatement(google.protobuf.Empty) returns (OverviewStatement){}
+    rpc GetOverviewStatement(OverviewStatmentRequest) returns (OverviewStatementResponse){}
+    rpc GetOverviewMonthlyStatement(google.protobuf.Empty) returns (OverviewStatementResponse){}
+    rpc GetOverviewAnnualStatement(google.protobuf.Empty) returns (OverviewStatementResponse){}
 }
 
 // Transaction
@@ -58,7 +59,12 @@ message AccountBalance {
 }
 
 // Overview Statement
-message OverviewStatement {
+message OverviewStatmentRequest {
+    google.protobuf.Timestamp from = 1;
+    google.protobuf.Timestamp to = 2;
+}
+
+message OverviewStatementResponse {
     int32 status = 1;
     string error = 2;
     OverviewStatmentSection revenue = 3;
@@ -77,7 +83,7 @@ message CategorizedEntry {
 }
 
 // Detailed Statement
-message DetailedStatement {
+message DetailedStatementResponse {
     int32 status = 1;
     string error = 2;
     DetailedStatmentSection revenue = 3;

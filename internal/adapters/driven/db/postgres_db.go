@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/sMARCHz/go-secretaria-finance/internal/core/domain"
@@ -192,4 +193,21 @@ func (f financeRepository) GetAllAccountBalance() ([]domain.Account, *errors.App
 		return nil, errors.InternalServerError("failed to get all balance of accounts")
 	}
 	return accounts, nil
+}
+
+func (f financeRepository) GetEntryByDaterange(from time.Time, to time.Time) ([]domain.Entry, *errors.AppError) {
+	var entries []domain.Entry
+	query := `SELECT e.entry_id, e.account_id, e.category_id, c.name as category_name, e.amount, e.description, e.created_at 
+	FROM entries e
+	INNER JOIN categories c
+	ON e.category_id = c.category_id 
+	WHERE (e.created_at BETWEEN $1 AND $2)
+	AND c."transaction_type" <> 'TRANSFER'
+	`
+	err := f.db.Select(&entries, query, from, to)
+	if err != nil {
+		f.logger.Error("failed to get entry by time range: ", err)
+		return nil, errors.InternalServerError("failed to get entry by time range")
+	}
+	return entries, nil
 }

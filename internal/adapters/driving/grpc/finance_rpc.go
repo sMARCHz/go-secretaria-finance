@@ -94,10 +94,25 @@ func (f financeServiceServer) GetBalance(ctx context.Context, r *emptypb.Empty) 
 	return pbResponse, nil
 }
 
-func (f financeServiceServer) GetOverviewMonthlyStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatement, error) {
+func (f financeServiceServer) GetOverviewStatement(ctx context.Context, r *pb.OverviewStatmentRequest) (*pb.OverviewStatementResponse, error) {
+	req := dto.GetOverviewStatementRequest{
+		From: r.From.AsTime(),
+		To:   r.To.AsTime(),
+	}
+	response, err := f.service.GetOverviewStatement(req)
+	pbResponse := response.ToProto()
+	if err != nil {
+		pbResponse.Status = int32(err.StatusCode)
+		pbResponse.Error = err.Message
+		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+	}
+	return pbResponse, nil
+}
+
+func (f financeServiceServer) GetOverviewMonthlyStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatementResponse, error) {
 	return nil, nil
 }
 
-func (f financeServiceServer) GetOverviewAnnualStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatement, error) {
+func (f financeServiceServer) GetOverviewAnnualStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatementResponse, error) {
 	return nil, nil
 }

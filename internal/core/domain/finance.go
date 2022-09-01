@@ -45,12 +45,13 @@ func (a Account) ToBalanceResponseDto() dto.BalanceResponse {
 }
 
 type Entry struct {
-	EntryID     int            `db:"entry_id"`
-	AccountID   int            `db:"account_id"`
-	CategoryID  int            `db:"category_id"`
-	Amount      float64        `db:"amount"`
-	Description sql.NullString `db:"description"`
-	CreatedAt   time.Time      `db:"created_at"`
+	EntryID      int            `db:"entry_id"`
+	AccountID    int            `db:"account_id"`
+	CategoryID   int            `db:"category_id"`
+	CategoryName string         `db:"category_name"`
+	Amount       float64        `db:"amount"`
+	Description  sql.NullString `db:"description"`
+	CreatedAt    time.Time      `db:"created_at"`
 }
 
 type Category struct {

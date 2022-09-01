@@ -59,3 +59,50 @@ func (b BalanceResponse) ToProto() *pb.AccountBalance {
 	}
 	return &response
 }
+
+type GetOverviewStatementRequest struct {
+	From time.Time
+	To   time.Time
+}
+
+type GetOverviewStatementResponse struct {
+	Revenue OverviewStatementSection
+	Expense OverviewStatementSection
+	Profit  float64
+}
+
+func (g GetOverviewStatementResponse) ToProto() *pb.OverviewStatementResponse {
+	return &pb.OverviewStatementResponse{
+		Revenue: g.Revenue.ToProto(),
+		Expense: g.Expense.ToProto(),
+		Profit:  g.Profit,
+	}
+}
+
+type OverviewStatementSection struct {
+	Total   float64
+	Entries []CategorizedEntry
+}
+
+func (o OverviewStatementSection) ToProto() *pb.OverviewStatmentSection {
+	entries := make([]*pb.CategorizedEntry, len(o.Entries))
+	for i, v := range o.Entries {
+		entries[i] = v.ToProto()
+	}
+	return &pb.OverviewStatmentSection{
+		Total:   o.Total,
+		Entries: entries,
+	}
+}
+
+type CategorizedEntry struct {
+	Category string
+	Amount   float64
+}
+
+func (c CategorizedEntry) ToProto() *pb.CategorizedEntry {
+	return &pb.CategorizedEntry{
+		Category: c.Category,
+		Amount:   c.Amount,
+	}
+}

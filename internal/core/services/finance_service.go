@@ -2,11 +2,13 @@ package services
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/sMARCHz/go-secretaria-finance/internal/core/domain"
 	"github.com/sMARCHz/go-secretaria-finance/internal/core/dto"
 	"github.com/sMARCHz/go-secretaria-finance/internal/core/errors"
 	"github.com/sMARCHz/go-secretaria-finance/internal/core/repository"
+	"github.com/sMARCHz/go-secretaria-finance/internal/logger"
 )
 
 type FinanceService interface {
@@ -14,17 +16,20 @@ type FinanceService interface {
 	Deposit(dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError)
 	Transfer(dto.TransferRequest) (dto.TransferResponse, *errors.AppError)
 	GetBalance() ([]dto.BalanceResponse, *errors.AppError)
+	GetOverviewStatement(dto.GetOverviewStatementRequest) (dto.GetOverviewStatementResponse, *errors.AppError)
 	GetOverviewMonthlyStatement()
 	GetOverviewAnnualStatement()
 }
 
 type financeService struct {
 	repository repository.FinanceRepository
+	logger     logger.Logger
 }
 
-func NewFinanceService(repo repository.FinanceRepository) FinanceService {
+func NewFinanceService(repo repository.FinanceRepository, logger logger.Logger) FinanceService {
 	return financeService{
 		repository: repo,
+		logger:     logger,
 	}
 }
 
@@ -112,6 +117,80 @@ func (f financeService) GetBalance() ([]dto.BalanceResponse, *errors.AppError) {
 		responses[i] = v.ToBalanceResponseDto()
 	}
 	return responses, nil
+}
+
+func (f financeService) GetOverviewStatement(req dto.GetOverviewStatementRequest) (dto.GetOverviewStatementResponse, *errors.AppError) {
+	loc, err := time.LoadLocation("Asia/Bangkok")
+	if err != nil {
+		f.logger.Error("failed to load time location")
+		return dto.GetOverviewStatementResponse{}, errors.InternalServerError("failed to load time location")
+	}
+	from := time.Date(req.From.Year(), req.From.Month(), req.From.Day(), 0, 0, 0, 0, loc)
+	to := time.Date(req.To.Year(), req.To.Month(), req.To.Day(), 23, 59, 59, 0, loc)
+
+	entries, appErr := f.repository.GetEntryByDaterange(from, to)
+	if appErr != nil {
+		return dto.GetOverviewStatementResponse{}, appErr
+	}
+
+	// calculate profit and split the entries 2 groups(revenue,expense)
+	profit := 0.0
+	totalRevenue := 0.0
+	totalExpense := 0.0
+	statement := map[string][]domain.Entry{
+		"revenue": {},
+		"expense": {},
+	}
+	for _, v := range entries {
+		profit += v.Amount
+		if v.Amount > 0 {
+			totalRevenue += v.Amount
+			statement["revenue"] = append(statement["revenue"], v)
+		} else {
+			totalExpense += v.Amount
+			statement["expense"] = append(statement["expense"], v)
+		}
+	}
+
+	// group entries by category
+	revenue := dto.OverviewStatementSection{
+		Total: totalRevenue,
+	}
+	expense := dto.OverviewStatementSection{
+		Total: totalExpense,
+	}
+	for k, entries := range statement {
+		categorizedEntry := f.groupEntriesByCategory(entries)
+		if k == "revenue" {
+			revenue.Entries = categorizedEntry
+		} else if k == "expense" {
+			expense.Entries = categorizedEntry
+		}
+	}
+	response := dto.GetOverviewStatementResponse{
+		Profit:  profit,
+		Revenue: revenue,
+		Expense: expense,
+	}
+	return response, nil
+}
+
+func (financeService) groupEntriesByCategory(entries []domain.Entry) []dto.CategorizedEntry {
+	m := make(map[string]dto.CategorizedEntry)
+	for _, e := range entries {
+		categorizedEntry, present := m[e.CategoryName]
+		if present {
+			categorizedEntry.Amount += e.Amount
+			m[e.CategoryName] = categorizedEntry
+		} else {
+			m[e.CategoryName] = dto.CategorizedEntry{Category: e.CategoryName, Amount: e.Amount}
+		}
+	}
+	categorizedEntries := make([]dto.CategorizedEntry, 0)
+	for _, v := range m {
+		categorizedEntries = append(categorizedEntries, v)
+	}
+	return categorizedEntries
 }
 
 func (f financeService) GetOverviewMonthlyStatement() {

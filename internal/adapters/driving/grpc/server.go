@@ -34,7 +34,7 @@ func NewGRPCServer(config config.AppConfiguration, logger logger.Logger, db *sql
 func (g GRPCServer) Start() {
 	// wiring
 	fRepo := db.NewFinanceRepository(g.database, g.logger)
-	fService := services.NewFinanceService(fRepo)
+	fService := services.NewFinanceService(fRepo, g.logger)
 	fServer := newFinanceServiceServer(fService, g.logger)
 
 	grpcServer := g.server
