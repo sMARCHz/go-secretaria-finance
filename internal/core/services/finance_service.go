@@ -17,8 +17,8 @@ type FinanceService interface {
 	Transfer(dto.TransferRequest) (dto.TransferResponse, *errors.AppError)
 	GetBalance() ([]dto.BalanceResponse, *errors.AppError)
 	GetOverviewStatement(dto.GetOverviewStatementRequest) (dto.GetOverviewStatementResponse, *errors.AppError)
-	GetOverviewMonthlyStatement()
-	GetOverviewAnnualStatement()
+	GetOverviewMonthlyStatement() (dto.GetOverviewStatementResponse, *errors.AppError)
+	GetOverviewAnnualStatement() (dto.GetOverviewStatementResponse, *errors.AppError)
 }
 
 type financeService struct {
@@ -193,10 +193,24 @@ func (financeService) groupEntriesByCategory(entries []domain.Entry) []dto.Categ
 	return categorizedEntries
 }
 
-func (f financeService) GetOverviewMonthlyStatement() {
-
+func (f financeService) GetOverviewMonthlyStatement() (dto.GetOverviewStatementResponse, *errors.AppError) {
+	today := time.Now()
+	from := time.Date(today.Year(), today.Month(), 1, 0, 0, 0, 0, time.UTC)
+	to := from.AddDate(0, 1, -1)
+	req := dto.GetOverviewStatementRequest{
+		From: from,
+		To:   to,
+	}
+	return f.GetOverviewStatement(req)
 }
 
-func (f financeService) GetOverviewAnnualStatement() {
-
+func (f financeService) GetOverviewAnnualStatement() (dto.GetOverviewStatementResponse, *errors.AppError) {
+	today := time.Now()
+	from := time.Date(today.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
+	to := time.Date(today.Year(), 12, 31, 0, 0, 0, 0, time.UTC)
+	req := dto.GetOverviewStatementRequest{
+		From: from,
+		To:   to,
+	}
+	return f.GetOverviewStatement(req)
 }

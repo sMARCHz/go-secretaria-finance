@@ -110,9 +110,23 @@ func (f financeServiceServer) GetOverviewStatement(ctx context.Context, r *pb.Ov
 }
 
 func (f financeServiceServer) GetOverviewMonthlyStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatementResponse, error) {
-	return nil, nil
+	response, err := f.service.GetOverviewMonthlyStatement()
+	pbResponse := response.ToProto()
+	if err != nil {
+		pbResponse.Status = int32(err.StatusCode)
+		pbResponse.Error = err.Message
+		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+	}
+	return pbResponse, nil
 }
 
 func (f financeServiceServer) GetOverviewAnnualStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatementResponse, error) {
-	return nil, nil
+	response, err := f.service.GetOverviewAnnualStatement()
+	pbResponse := response.ToProto()
+	if err != nil {
+		pbResponse.Status = int32(err.StatusCode)
+		pbResponse.Error = err.Message
+		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+	}
+	return pbResponse, nil
 }
