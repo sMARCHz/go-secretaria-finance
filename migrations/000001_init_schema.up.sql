@@ -50,9 +50,11 @@ CREATE INDEX ON "entries" ("category_id");
 
 CREATE INDEX ON "entries" ("account_id", "category_id");
 
-CREATE INDEX ON "categories" ("name");
-
 CREATE INDEX ON "categories" ("name_abbr");
+
+CREATE INDEX ON "categories" ("transaction_type");
+
+CREATE INDEX ON "categories" ("name_abbr", "transaction_type");
 
 CREATE INDEX ON "transfers" ("from_account_id");
 
