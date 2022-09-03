@@ -4,6 +4,4 @@ ENV CGO_ENABLED=0
 
 WORKDIR /app
 
-COPY . .
-
 RUN go install github.com/cespare/reflex@latest
