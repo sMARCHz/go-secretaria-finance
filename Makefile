@@ -1,10 +1,13 @@
 include secret.env
 
 up:
-	docker-compose up
+	docker-compose up -d
 
 down:
 	docker-compose down
+
+stop:
+	docker-compose stop
 
 migrateup:
 	migrate -path migrations -database "postgres://smarchz:${DB_PASSWORD}@localhost:5432/secretaria?sslmode=disable" -verbose up
