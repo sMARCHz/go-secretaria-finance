@@ -17,14 +17,14 @@ type financeServiceServer struct {
 	pb.UnimplementedFinanceServiceServer
 }
 
-func newFinanceServiceServer(service services.FinanceService, logger logger.Logger) financeServiceServer {
-	return financeServiceServer{
+func newFinanceServiceServer(service services.FinanceService, logger logger.Logger) *financeServiceServer {
+	return &financeServiceServer{
 		service: service,
 		logger:  logger,
 	}
 }
 
-func (f financeServiceServer) Withdraw(ctx context.Context, r *pb.TransactionRequest) (*pb.TransactionResponse, error) {
+func (f *financeServiceServer) Withdraw(ctx context.Context, r *pb.TransactionRequest) (*pb.TransactionResponse, error) {
 	req := dto.TransactionRequest{
 		AccountName: r.AccountName,
 		Category:    r.Category,
@@ -33,16 +33,16 @@ func (f financeServiceServer) Withdraw(ctx context.Context, r *pb.TransactionReq
 		CreatedAt:   r.Timestamp.AsTime(),
 	}
 	response, err := f.service.Withdraw(req)
-	pbResponse := response.ToProto()
 	if err != nil {
-		pbResponse.Status = int32(err.StatusCode)
-		pbResponse.Error = err.Message
-		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+		return &pb.TransactionResponse{
+			Status: int32(err.StatusCode),
+			Error:  err.Message,
+		}, utils.ConvertHttpErrToGRPC(err, f.logger)
 	}
-	return pbResponse, nil
+	return response.ToProto(), nil
 }
 
-func (f financeServiceServer) Deposit(ctx context.Context, r *pb.TransactionRequest) (*pb.TransactionResponse, error) {
+func (f *financeServiceServer) Deposit(ctx context.Context, r *pb.TransactionRequest) (*pb.TransactionResponse, error) {
 	req := dto.TransactionRequest{
 		AccountName: r.AccountName,
 		Category:    r.Category,
@@ -51,16 +51,16 @@ func (f financeServiceServer) Deposit(ctx context.Context, r *pb.TransactionRequ
 		CreatedAt:   r.Timestamp.AsTime(),
 	}
 	response, err := f.service.Deposit(req)
-	pbResponse := response.ToProto()
 	if err != nil {
-		pbResponse.Status = int32(err.StatusCode)
-		pbResponse.Error = err.Message
-		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+		return &pb.TransactionResponse{
+			Status: int32(err.StatusCode),
+			Error:  err.Message,
+		}, utils.ConvertHttpErrToGRPC(err, f.logger)
 	}
-	return pbResponse, nil
+	return response.ToProto(), nil
 }
 
-func (f financeServiceServer) Transfer(ctx context.Context, r *pb.TransferRequest) (*pb.TransferResponse, error) {
+func (f *financeServiceServer) Transfer(ctx context.Context, r *pb.TransferRequest) (*pb.TransferResponse, error) {
 	req := dto.TransferRequest{
 		FromAccountName: r.FromAccountName,
 		ToAccountName:   r.ToAccountName,
@@ -68,16 +68,16 @@ func (f financeServiceServer) Transfer(ctx context.Context, r *pb.TransferReques
 		Amount:          r.Amount,
 	}
 	response, err := f.service.Transfer(req)
-	pbResponse := response.ToProto()
 	if err != nil {
-		pbResponse.Status = int32(err.StatusCode)
-		pbResponse.Error = err.Message
-		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+		return &pb.TransferResponse{
+			Status: int32(err.StatusCode),
+			Error:  err.Message,
+		}, utils.ConvertHttpErrToGRPC(err, f.logger)
 	}
-	return pbResponse, nil
+	return response.ToProto(), nil
 }
 
-func (f financeServiceServer) GetBalance(ctx context.Context, r *emptypb.Empty) (*pb.GetBalanceResponse, error) {
+func (f *financeServiceServer) GetBalance(ctx context.Context, r *emptypb.Empty) (*pb.GetBalanceResponse, error) {
 	response, err := f.service.GetBalance()
 
 	accountsBalance := make([]*pb.AccountBalance, len(response))
@@ -85,48 +85,48 @@ func (f financeServiceServer) GetBalance(ctx context.Context, r *emptypb.Empty) 
 		accountsBalance[i] = v.ToProto()
 	}
 
-	pbResponse := &pb.GetBalanceResponse{Accounts: accountsBalance}
 	if err != nil {
-		pbResponse.Status = int32(err.StatusCode)
-		pbResponse.Error = err.Message
-		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+		return &pb.GetBalanceResponse{
+			Status: int32(err.StatusCode),
+			Error:  err.Message,
+		}, utils.ConvertHttpErrToGRPC(err, f.logger)
 	}
-	return pbResponse, nil
+	return &pb.GetBalanceResponse{Accounts: accountsBalance}, nil
 }
 
-func (f financeServiceServer) GetOverviewStatement(ctx context.Context, r *pb.OverviewStatmentRequest) (*pb.OverviewStatementResponse, error) {
+func (f *financeServiceServer) GetOverviewStatement(ctx context.Context, r *pb.OverviewStatmentRequest) (*pb.OverviewStatementResponse, error) {
 	req := dto.GetOverviewStatementRequest{
 		From: r.From.AsTime(),
 		To:   r.To.AsTime(),
 	}
 	response, err := f.service.GetOverviewStatement(req)
-	pbResponse := response.ToProto()
 	if err != nil {
-		pbResponse.Status = int32(err.StatusCode)
-		pbResponse.Error = err.Message
-		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+		return &pb.OverviewStatementResponse{
+			Status: int32(err.StatusCode),
+			Error:  err.Message,
+		}, utils.ConvertHttpErrToGRPC(err, f.logger)
 	}
-	return pbResponse, nil
+	return response.ToProto(), nil
 }
 
-func (f financeServiceServer) GetOverviewMonthlyStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatementResponse, error) {
+func (f *financeServiceServer) GetOverviewMonthlyStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatementResponse, error) {
 	response, err := f.service.GetOverviewMonthlyStatement()
-	pbResponse := response.ToProto()
 	if err != nil {
-		pbResponse.Status = int32(err.StatusCode)
-		pbResponse.Error = err.Message
-		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+		return &pb.OverviewStatementResponse{
+			Status: int32(err.StatusCode),
+			Error:  err.Message,
+		}, utils.ConvertHttpErrToGRPC(err, f.logger)
 	}
-	return pbResponse, nil
+	return response.ToProto(), nil
 }
 
-func (f financeServiceServer) GetOverviewAnnualStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatementResponse, error) {
+func (f *financeServiceServer) GetOverviewAnnualStatement(ctx context.Context, r *emptypb.Empty) (*pb.OverviewStatementResponse, error) {
 	response, err := f.service.GetOverviewAnnualStatement()
-	pbResponse := response.ToProto()
 	if err != nil {
-		pbResponse.Status = int32(err.StatusCode)
-		pbResponse.Error = err.Message
-		return pbResponse, utils.ConvertHttpErrToGRPC(err, f.logger)
+		return &pb.OverviewStatementResponse{
+			Status: int32(err.StatusCode),
+			Error:  err.Message,
+		}, utils.ConvertHttpErrToGRPC(err, f.logger)
 	}
-	return pbResponse, nil
+	return response.ToProto(), nil
 }

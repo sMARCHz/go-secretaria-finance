@@ -12,13 +12,13 @@ import (
 )
 
 type FinanceService interface {
-	Withdraw(dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError)
-	Deposit(dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError)
-	Transfer(dto.TransferRequest) (dto.TransferResponse, *errors.AppError)
+	Withdraw(dto.TransactionRequest) (*dto.TransactionResponse, *errors.AppError)
+	Deposit(dto.TransactionRequest) (*dto.TransactionResponse, *errors.AppError)
+	Transfer(dto.TransferRequest) (*dto.TransferResponse, *errors.AppError)
 	GetBalance() ([]dto.BalanceResponse, *errors.AppError)
-	GetOverviewStatement(dto.GetOverviewStatementRequest) (dto.GetOverviewStatementResponse, *errors.AppError)
-	GetOverviewMonthlyStatement() (dto.GetOverviewStatementResponse, *errors.AppError)
-	GetOverviewAnnualStatement() (dto.GetOverviewStatementResponse, *errors.AppError)
+	GetOverviewStatement(dto.GetOverviewStatementRequest) (*dto.GetOverviewStatementResponse, *errors.AppError)
+	GetOverviewMonthlyStatement() (*dto.GetOverviewStatementResponse, *errors.AppError)
+	GetOverviewAnnualStatement() (*dto.GetOverviewStatementResponse, *errors.AppError)
 }
 
 type financeService struct {
@@ -27,86 +27,86 @@ type financeService struct {
 }
 
 func NewFinanceService(repo repository.FinanceRepository, logger logger.Logger) FinanceService {
-	return financeService{
+	return &financeService{
 		repository: repo,
 		logger:     logger,
 	}
 }
 
-func (f financeService) Withdraw(req dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError) {
+func (f *financeService) Withdraw(req dto.TransactionRequest) (*dto.TransactionResponse, *errors.AppError) {
 	categoryID, err := f.repository.GetCategoryIDByAbbrNameAndTransactionType(req.Category, "WITHDRAW")
 	if err != nil {
-		return dto.TransactionResponse{}, err
+		return nil, err
 	}
 
 	accountID, err := f.repository.GetAccountIDByName(req.AccountName)
 	if err != nil {
-		return dto.TransactionResponse{}, err
+		return nil, err
 	}
 
 	transaction := domain.Transaction{
-		AccountID:   accountID,
-		CategoryID:  categoryID,
+		AccountID:   *accountID,
+		CategoryID:  *categoryID,
 		Description: sql.NullString{String: req.Description},
 		Amount:      -req.Amount,
 		CreatedAt:   req.CreatedAt,
 	}
 	account, err := f.repository.Withdraw(transaction)
 	if err != nil {
-		return dto.TransactionResponse{}, err
+		return nil, err
 	}
 	return account.ToTransactionResponseDto(), nil
 }
 
-func (f financeService) Deposit(req dto.TransactionRequest) (dto.TransactionResponse, *errors.AppError) {
+func (f *financeService) Deposit(req dto.TransactionRequest) (*dto.TransactionResponse, *errors.AppError) {
 	categoryID, err := f.repository.GetCategoryIDByAbbrNameAndTransactionType(req.Category, "DEPOSIT")
 	if err != nil {
-		return dto.TransactionResponse{}, err
+		return nil, err
 	}
 
 	accountID, err := f.repository.GetAccountIDByName(req.AccountName)
 	if err != nil {
-		return dto.TransactionResponse{}, err
+		return nil, err
 	}
 
 	transaction := domain.Transaction{
-		AccountID:   accountID,
-		CategoryID:  categoryID,
+		AccountID:   *accountID,
+		CategoryID:  *categoryID,
 		Description: sql.NullString{String: req.Description},
 		Amount:      req.Amount,
 		CreatedAt:   req.CreatedAt,
 	}
 	account, err := f.repository.Deposit(transaction)
 	if err != nil {
-		return dto.TransactionResponse{}, err
+		return nil, err
 	}
 	return account.ToTransactionResponseDto(), nil
 }
 
-func (f financeService) Transfer(req dto.TransferRequest) (dto.TransferResponse, *errors.AppError) {
+func (f *financeService) Transfer(req dto.TransferRequest) (*dto.TransferResponse, *errors.AppError) {
 	fromAccountID, err := f.repository.GetAccountIDByName(req.FromAccountName)
 	if err != nil {
-		return dto.TransferResponse{}, err
+		return nil, err
 	}
 	toAccountID, err := f.repository.GetAccountIDByName(req.ToAccountName)
 	if err != nil {
-		return dto.TransferResponse{}, err
+		return nil, err
 	}
 
 	transfer := domain.Transfer{
-		FromAccountID: fromAccountID,
-		ToAccountID:   toAccountID,
+		FromAccountID: *fromAccountID,
+		ToAccountID:   *toAccountID,
 		Description:   sql.NullString{String: req.Description},
 		Amount:        req.Amount,
 	}
 	fromAccount, err := f.repository.Transfer(transfer)
 	if err != nil {
-		return dto.TransferResponse{}, err
+		return nil, err
 	}
 	return fromAccount.ToTransferResponseDto(), nil
 }
 
-func (f financeService) GetBalance() ([]dto.BalanceResponse, *errors.AppError) {
+func (f *financeService) GetBalance() ([]dto.BalanceResponse, *errors.AppError) {
 	accounts, err := f.repository.GetAllAccountBalance()
 	if err != nil {
 		return nil, err
@@ -114,23 +114,23 @@ func (f financeService) GetBalance() ([]dto.BalanceResponse, *errors.AppError) {
 
 	responses := make([]dto.BalanceResponse, len(accounts))
 	for i, v := range accounts {
-		responses[i] = v.ToBalanceResponseDto()
+		responses[i] = *v.ToBalanceResponseDto()
 	}
 	return responses, nil
 }
 
-func (f financeService) GetOverviewStatement(req dto.GetOverviewStatementRequest) (dto.GetOverviewStatementResponse, *errors.AppError) {
+func (f *financeService) GetOverviewStatement(req dto.GetOverviewStatementRequest) (*dto.GetOverviewStatementResponse, *errors.AppError) {
 	loc, err := time.LoadLocation("Asia/Bangkok")
 	if err != nil {
 		f.logger.Error("failed to load time location")
-		return dto.GetOverviewStatementResponse{}, errors.InternalServerError("failed to load time location")
+		return nil, errors.InternalServerError("failed to load time location")
 	}
 	from := time.Date(req.From.Year(), req.From.Month(), req.From.Day(), 0, 0, 0, 0, loc)
 	to := time.Date(req.To.Year(), req.To.Month(), req.To.Day(), 23, 59, 59, 0, loc)
 
 	entries, appErr := f.repository.GetEntryByDaterange(from, to)
 	if appErr != nil {
-		return dto.GetOverviewStatementResponse{}, appErr
+		return nil, appErr
 	}
 
 	// calculate profit and split the entries 2 groups(revenue,expense)
@@ -167,15 +167,14 @@ func (f financeService) GetOverviewStatement(req dto.GetOverviewStatementRequest
 			expense.Entries = categorizedEntry
 		}
 	}
-	response := dto.GetOverviewStatementResponse{
+	return &dto.GetOverviewStatementResponse{
 		Profit:  profit,
 		Revenue: revenue,
 		Expense: expense,
-	}
-	return response, nil
+	}, nil
 }
 
-func (financeService) groupEntriesByCategory(entries []domain.Entry) []dto.CategorizedEntry {
+func (*financeService) groupEntriesByCategory(entries []domain.Entry) []dto.CategorizedEntry {
 	m := make(map[string]dto.CategorizedEntry)
 	for _, e := range entries {
 		categorizedEntry, present := m[e.CategoryName]
@@ -193,7 +192,7 @@ func (financeService) groupEntriesByCategory(entries []domain.Entry) []dto.Categ
 	return categorizedEntries
 }
 
-func (f financeService) GetOverviewMonthlyStatement() (dto.GetOverviewStatementResponse, *errors.AppError) {
+func (f *financeService) GetOverviewMonthlyStatement() (*dto.GetOverviewStatementResponse, *errors.AppError) {
 	today := time.Now()
 	from := time.Date(today.Year(), today.Month(), 1, 0, 0, 0, 0, time.UTC)
 	to := from.AddDate(0, 1, -1)
@@ -204,7 +203,7 @@ func (f financeService) GetOverviewMonthlyStatement() (dto.GetOverviewStatementR
 	return f.GetOverviewStatement(req)
 }
 
-func (f financeService) GetOverviewAnnualStatement() (dto.GetOverviewStatementResponse, *errors.AppError) {
+func (f *financeService) GetOverviewAnnualStatement() (*dto.GetOverviewStatementResponse, *errors.AppError) {
 	today := time.Now()
 	from := time.Date(today.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
 	to := time.Date(today.Year(), 12, 31, 0, 0, 0, 0, time.UTC)
