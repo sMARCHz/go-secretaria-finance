@@ -51,7 +51,7 @@ func (f *financeRepository) GetCategoryIDByAbbrNameAndTransactionType(categoryAb
 	return &categoryID, nil
 }
 
-func (f *financeRepository) Withdraw(t domain.Transaction) (*domain.Account, *errors.AppError) {
+func (f *financeRepository) Withdraw(t domain.TransactionInput) (*domain.Account, *errors.AppError) {
 	tx, err := f.db.Begin()
 	if err != nil {
 		f.logger.Error("failed to begin transaction: ", err)
@@ -97,7 +97,7 @@ func (f *financeRepository) Withdraw(t domain.Transaction) (*domain.Account, *er
 	return &account, nil
 }
 
-func (f *financeRepository) Deposit(t domain.Transaction) (*domain.Account, *errors.AppError) {
+func (f *financeRepository) Deposit(t domain.TransactionInput) (*domain.Account, *errors.AppError) {
 	tx, err := f.db.Begin()
 	if err != nil {
 		f.logger.Error("failed to begin transaction: ", err)
@@ -130,7 +130,7 @@ func (f *financeRepository) Deposit(t domain.Transaction) (*domain.Account, *err
 	return &account, nil
 }
 
-func (f *financeRepository) Transfer(t domain.Transfer) (*domain.Account, *errors.AppError) {
+func (f *financeRepository) Transfer(t domain.TransferInput) (*domain.Account, *errors.AppError) {
 	tx, err := f.db.Begin()
 	if err != nil {
 		f.logger.Error("failed to begin transaction: ", err)
@@ -197,7 +197,8 @@ func (f *financeRepository) GetAllAccountBalance() ([]domain.Account, *errors.Ap
 
 func (f *financeRepository) GetEntryByDaterange(from time.Time, to time.Time) ([]domain.Entry, *errors.AppError) {
 	var entries []domain.Entry
-	query := `SELECT e.entry_id, e.account_id, e.category_id, c.name as category_name, e.amount, e.description, e.created_at 
+	query := `SELECT e.entry_id, e.account_id, e.amount, e.description, e.created_at, 
+	c.category_id "category.category_id", c.name "category.name", c.name_abbr "category.name_abbr", c.created_at "category.created_at" 
 	FROM entries e
 	INNER JOIN categories c
 	ON e.category_id = c.category_id 

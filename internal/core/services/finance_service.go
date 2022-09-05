@@ -44,7 +44,7 @@ func (f *financeService) Withdraw(req dto.TransactionRequest) (*dto.TransactionR
 		return nil, err
 	}
 
-	transaction := domain.Transaction{
+	transaction := domain.TransactionInput{
 		AccountID:   *accountID,
 		CategoryID:  *categoryID,
 		Description: sql.NullString{String: req.Description},
@@ -69,7 +69,7 @@ func (f *financeService) Deposit(req dto.TransactionRequest) (*dto.TransactionRe
 		return nil, err
 	}
 
-	transaction := domain.Transaction{
+	transaction := domain.TransactionInput{
 		AccountID:   *accountID,
 		CategoryID:  *categoryID,
 		Description: sql.NullString{String: req.Description},
@@ -93,11 +93,11 @@ func (f *financeService) Transfer(req dto.TransferRequest) (*dto.TransferRespons
 		return nil, err
 	}
 
-	transfer := domain.Transfer{
+	transfer := domain.TransferInput{
 		FromAccountID: *fromAccountID,
 		ToAccountID:   *toAccountID,
-		Description:   sql.NullString{String: req.Description},
 		Amount:        req.Amount,
+		Description:   sql.NullString{String: req.Description},
 	}
 	fromAccount, err := f.repository.Transfer(transfer)
 	if err != nil {
@@ -177,12 +177,12 @@ func (f *financeService) GetOverviewStatement(req dto.GetOverviewStatementReques
 func (*financeService) groupEntriesByCategory(entries []domain.Entry) []dto.CategorizedEntry {
 	m := make(map[string]dto.CategorizedEntry)
 	for _, e := range entries {
-		categorizedEntry, present := m[e.CategoryName]
+		categorizedEntry, present := m[e.Category.Name]
 		if present {
 			categorizedEntry.Amount += e.Amount
-			m[e.CategoryName] = categorizedEntry
+			m[e.Category.Name] = categorizedEntry
 		} else {
-			m[e.CategoryName] = dto.CategorizedEntry{Category: e.CategoryName, Amount: e.Amount}
+			m[e.Category.Name] = dto.CategorizedEntry{Category: e.Category.Name, Amount: e.Amount}
 		}
 	}
 	categorizedEntries := make([]dto.CategorizedEntry, 0)

@@ -8,9 +8,9 @@ import (
 )
 
 type FinanceRepository interface {
-	Withdraw(domain.Transaction) (*domain.Account, *errors.AppError)
-	Deposit(domain.Transaction) (*domain.Account, *errors.AppError)
-	Transfer(domain.Transfer) (*domain.Account, *errors.AppError)
+	Withdraw(domain.TransactionInput) (*domain.Account, *errors.AppError)
+	Deposit(domain.TransactionInput) (*domain.Account, *errors.AppError)
+	Transfer(domain.TransferInput) (*domain.Account, *errors.AppError)
 	GetAllAccountBalance() ([]domain.Account, *errors.AppError)
 	GetEntryByDaterange(From time.Time, To time.Time) ([]domain.Entry, *errors.AppError)
 
