@@ -72,9 +72,8 @@ func (f *financeRepository) Withdraw(t domain.TransactionInput) (*domain.Account
 	}
 
 	// Insert entry
-	var entryID int
-	query := "INSERT INTO entries(account_id, category_id, amount, description, created_at) VALUES($1, $2, $3, $4, $5) RETURNING entry_id"
-	if err := tx.QueryRow(query, t.AccountID, t.CategoryID, t.Amount, t.Description, t.CreatedAt).Scan(&entryID); err != nil {
+	query := "INSERT INTO entries(account_id, category_id, amount, description) VALUES($1, $2, $3, $4)"
+	if _, err := tx.Exec(query, t.AccountID, t.CategoryID, t.Amount, t.Description); err != nil {
 		tx.Rollback()
 		f.logger.Error("failed to insert entries: ", err)
 		return nil, errors.InternalServerError("failed to insert entries")
@@ -105,9 +104,8 @@ func (f *financeRepository) Deposit(t domain.TransactionInput) (*domain.Account,
 	}
 
 	// Insert entry
-	var entryID int
-	query := "INSERT INTO entries(account_id, category_id, amount, description, created_at) VALUES($1, $2, $3, $4, $5) RETURNING entry_id"
-	if err := tx.QueryRow(query, t.AccountID, t.CategoryID, t.Amount, t.Description, t.CreatedAt).Scan(&entryID); err != nil {
+	query := "INSERT INTO entries(account_id, category_id, amount, description) VALUES($1, $2, $3, $4)"
+	if _, err := tx.Exec(query, t.AccountID, t.CategoryID, t.Amount, t.Description); err != nil {
 		tx.Rollback()
 		f.logger.Error("failed to insert entries: ", err)
 		return nil, errors.InternalServerError("failed to insert entries")
@@ -137,19 +135,19 @@ func (f *financeRepository) Transfer(t domain.TransferInput) (*domain.Account, *
 		return nil, errors.InternalServerError("failed to begin transaction")
 	}
 
-	// Insert transfer
-	if _, err := tx.Exec("INSERT INTO transfers(from_account_id, to_account_id, amount) VALUES($1, $2, $3)", t.FromAccountID, t.ToAccountID, t.Amount); err != nil {
-		tx.Rollback()
-		f.logger.Error("failed to insert transfers: ", err)
-		return nil, errors.InternalServerError("failed to insert transfers")
-	}
-
 	// Get categoryID of TRANSFER
 	var categoryID int
 	if err := tx.QueryRow("SELECT category_id FROM categories WHERE name = 'transfer' AND transaction_type = 'TRANSFER' LIMIT 1").Scan(&categoryID); err != nil {
 		tx.Rollback()
 		f.logger.Error("failed to get categoryID: ", err)
 		return nil, errors.InternalServerError("failed to get categoryID")
+	}
+
+	// Insert transfer
+	if _, err := tx.Exec("INSERT INTO transfers(from_account_id, to_account_id, amount) VALUES($1, $2, $3)", t.FromAccountID, t.ToAccountID, t.Amount); err != nil {
+		tx.Rollback()
+		f.logger.Error("failed to insert transfers: ", err)
+		return nil, errors.InternalServerError("failed to insert transfers")
 	}
 
 	// Insert entries of fromAccount and toAccount
@@ -166,7 +164,7 @@ func (f *financeRepository) Transfer(t domain.TransferInput) (*domain.Account, *
 
 	// Update balance of fromAccount and to Account
 	var account domain.Account
-	if err := tx.QueryRow("UPDATE accounts SET balance = balance + $1 WHERE account_id = $2 RETURNING name, balance", -t.Amount, t.FromAccountID).Scan(&account.Name, &account.Balance); err != nil {
+	if err := tx.QueryRow("UPDATE accounts SET balance = balance + $1 WHERE account_id = $2 RETURNING name, balance, currency, created_at", -t.Amount, t.FromAccountID).Scan(&account.Name, &account.Balance, &account.Currency, &account.CreatedAt); err != nil {
 		tx.Rollback()
 		f.logger.Error("failed to update from_account balance: ", err)
 		return nil, errors.InternalServerError("failed to update from_account balance")

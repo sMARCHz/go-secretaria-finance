@@ -7,11 +7,10 @@ import (
 )
 
 type TransactionRequest struct {
-	AccountName string    `json:"account_name"`
-	Category    string    `json:"category"`
-	Description string    `json:"description"`
-	Amount      float64   `json:"amount"`
-	CreatedAt   time.Time `json:"-"`
+	AccountName string  `json:"account_name"`
+	Category    string  `json:"category"`
+	Description string  `json:"description"`
+	Amount      float64 `json:"amount"`
 }
 
 type TransactionResponse struct {

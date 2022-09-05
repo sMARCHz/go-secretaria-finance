@@ -73,4 +73,5 @@ type TransferInput struct {
 	ToAccountID   int
 	Amount        float64
 	Description   sql.NullString
+	CreatedAt     time.Time
 }

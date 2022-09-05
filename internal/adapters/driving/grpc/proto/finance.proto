@@ -20,7 +20,6 @@ message TransactionRequest {
     double amount = 2;
     string category = 3;
     string description = 4;
-    google.protobuf.Timestamp timestamp = 5;
 }
 
 message TransactionResponse {
@@ -36,7 +35,6 @@ message TransferRequest {
     string to_account_name = 2;
     double amount = 3;
     string description = 4;
-    google.protobuf.Timestamp timestamp = 5;
 }
 
 message TransferResponse {

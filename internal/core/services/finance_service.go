@@ -49,7 +49,6 @@ func (f *financeService) Withdraw(req dto.TransactionRequest) (*dto.TransactionR
 		CategoryID:  *categoryID,
 		Description: sql.NullString{String: req.Description},
 		Amount:      -req.Amount,
-		CreatedAt:   req.CreatedAt,
 	}
 	account, err := f.repository.Withdraw(transaction)
 	if err != nil {
@@ -74,7 +73,6 @@ func (f *financeService) Deposit(req dto.TransactionRequest) (*dto.TransactionRe
 		CategoryID:  *categoryID,
 		Description: sql.NullString{String: req.Description},
 		Amount:      req.Amount,
-		CreatedAt:   req.CreatedAt,
 	}
 	account, err := f.repository.Deposit(transaction)
 	if err != nil {

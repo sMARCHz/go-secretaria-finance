@@ -30,7 +30,6 @@ func (f *financeServiceServer) Withdraw(ctx context.Context, r *pb.TransactionRe
 		Category:    r.Category,
 		Description: r.Description,
 		Amount:      r.Amount,
-		CreatedAt:   r.Timestamp.AsTime(),
 	}
 	response, err := f.service.Withdraw(req)
 	if err != nil {
@@ -48,7 +47,6 @@ func (f *financeServiceServer) Deposit(ctx context.Context, r *pb.TransactionReq
 		Category:    r.Category,
 		Description: r.Description,
 		Amount:      r.Amount,
-		CreatedAt:   r.Timestamp.AsTime(),
 	}
 	response, err := f.service.Deposit(req)
 	if err != nil {
