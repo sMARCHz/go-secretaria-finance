@@ -40,7 +40,7 @@ func NewZapProduction() *zap.Logger {
 	config.EncoderConfig = encoderConfig
 	config.OutputPaths = []string{"logs/secretaria.log", "stderr"}
 
-	log, err := config.Build(zap.AddCallerSkip(1))
+	log, err := config.Build()
 	if err != nil {
 		panic(err)
 	}
