@@ -63,7 +63,7 @@ type Transfer struct {
 type TransactionInput struct {
 	AccountID   int
 	CategoryID  int
-	Description sql.NullString
+	Description string
 	Amount      float64
 	CreatedAt   time.Time
 }
@@ -72,6 +72,6 @@ type TransferInput struct {
 	FromAccountID int
 	ToAccountID   int
 	Amount        float64
-	Description   sql.NullString
+	Description   string
 	CreatedAt     time.Time
 }

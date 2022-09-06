@@ -1,7 +1,6 @@
 package services
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/sMARCHz/go-secretaria-finance/internal/core/domain"
@@ -47,7 +46,7 @@ func (f *financeService) Withdraw(req dto.TransactionRequest) (*dto.TransactionR
 	transaction := domain.TransactionInput{
 		AccountID:   *accountID,
 		CategoryID:  *categoryID,
-		Description: sql.NullString{String: req.Description},
+		Description: req.Description,
 		Amount:      -req.Amount,
 	}
 	account, err := f.repository.Withdraw(transaction)
@@ -71,7 +70,7 @@ func (f *financeService) Deposit(req dto.TransactionRequest) (*dto.TransactionRe
 	transaction := domain.TransactionInput{
 		AccountID:   *accountID,
 		CategoryID:  *categoryID,
-		Description: sql.NullString{String: req.Description},
+		Description: req.Description,
 		Amount:      req.Amount,
 	}
 	account, err := f.repository.Deposit(transaction)
@@ -95,7 +94,7 @@ func (f *financeService) Transfer(req dto.TransferRequest) (*dto.TransferRespons
 		FromAccountID: *fromAccountID,
 		ToAccountID:   *toAccountID,
 		Amount:        req.Amount,
-		Description:   sql.NullString{String: req.Description},
+		Description:   req.Description,
 	}
 	fromAccount, err := f.repository.Transfer(transfer)
 	if err != nil {
