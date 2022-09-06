@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 
 	"github.com/jmoiron/sqlx"
@@ -34,20 +33,15 @@ func main() {
 		// TODO
 	} else {
 		grpcServer, shutdown := grpc.NewGRPCServer(config.App, logger, db)
-
-		// Stop server
-		wg := sync.WaitGroup{}
-		wg.Add(1)
 		go func() {
-			s := <-stopCh
-			logger.Infof("got signal '%v', attempting graceful shutdown", s)
-			shutdown()
-			closeDBConnection()
-			wg.Done()
+			grpcServer.Start()
 		}()
 
-		grpcServer.Start()
-		wg.Wait()
+		// Shutdown server
+		s := <-stopCh
+		logger.Infof("got signal '%v', attempting graceful shutdown", s)
+		shutdown()
+		closeDBConnection()
 		logger.Info("Gracefully shutting down...")
 	}
 }
