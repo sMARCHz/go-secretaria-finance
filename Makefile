@@ -18,4 +18,4 @@ migratedown:
 protoc:
 	protoc internal/adapters/driving/grpc/proto/finance.proto --go_out=internal/adapters/driving/grpc --go-grpc_out=internal/adapters/driving/grpc
 
-.PHONY: up down migrateup migratedown protoc
+.PHONY: up down stop migrateup migratedown protoc
