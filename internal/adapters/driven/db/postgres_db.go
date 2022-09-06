@@ -93,6 +93,7 @@ func (f *financeRepository) Withdraw(t domain.TransactionInput) (*domain.Account
 		f.logger.Error("failed to commit transaction: ", err)
 		return nil, errors.InternalServerError("failed to commit transaction")
 	}
+	f.logger.Infof("successfully withdraw ฿%v to accountID=%v", -t.Amount, t.AccountID)
 	return &account, nil
 }
 
@@ -125,6 +126,7 @@ func (f *financeRepository) Deposit(t domain.TransactionInput) (*domain.Account,
 		f.logger.Error("failed to commit transaction: ", err)
 		return nil, errors.InternalServerError("failed to commit transaction")
 	}
+	f.logger.Infof("successfully deposit ฿%v to accountID=%v", t.Amount, t.AccountID)
 	return &account, nil
 }
 
@@ -181,6 +183,7 @@ func (f *financeRepository) Transfer(t domain.TransferInput) (*domain.Account, *
 		f.logger.Error("failed to commit transaction: ", err)
 		return nil, errors.InternalServerError("failed to commit transaction")
 	}
+	f.logger.Infof("successfully transfer ฿%v from accountID=%v to accountID=%v", t.Amount, t.FromAccountID, t.ToAccountID)
 	return &account, nil
 }
 
