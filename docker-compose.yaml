@@ -1,3 +1,4 @@
+version: "3"
 services:
   app:
     build: 
@@ -12,6 +13,7 @@ services:
     
   postgres:
     image: postgres:14
+    restart: always
     ports: 
       - "5432:5432"
     container_name: postgres14
@@ -21,3 +23,7 @@ services:
       - TZ='GMT+7'
       - PGTZ='GMT+7'
     env_file: ./secret.env
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+volumes:
+  postgresdata:
