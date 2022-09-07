@@ -32,24 +32,20 @@ func NewGRPCServer(config config.AppConfiguration, logger logger.Logger, db *sql
 }
 
 func (g GRPCServer) Start() {
-	// wiring
+	// Wiring
 	fRepo := db.NewFinanceRepository(g.database, g.logger)
 	fService := services.NewFinanceService(fRepo, g.logger)
 	fServer := newFinanceServiceServer(fService, g.logger)
 
-	grpcServer := g.server
-	logger := g.logger
-	address := g.config.Address
-	port := g.config.Port
-	lis, err := net.Listen("tcp", fmt.Sprintf("%v:%v", address, port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", g.config.Port))
 	if err != nil {
-		logger.Fatal("failed to listen: ", err)
+		g.logger.Fatal("failed to listen: ", err)
 	}
 
 	// Register service to grpc server
-	pb.RegisterFinanceServiceServer(grpcServer, fServer)
+	pb.RegisterFinanceServiceServer(g.server, fServer)
 
 	// Start server
-	logger.Infof("Starting gRPC server at %v:%v...", address, port)
-	grpcServer.Serve(lis)
+	g.logger.Infof("Starting gRPC server at :%v...", g.config.Port)
+	g.server.Serve(lis)
 }

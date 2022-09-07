@@ -13,8 +13,7 @@ type Configuration struct {
 }
 
 type AppConfiguration struct {
-	Address string
-	Port    uint
+	Port string
 }
 
 type DatabaseConfiguration struct {

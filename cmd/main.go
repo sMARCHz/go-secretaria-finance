@@ -39,7 +39,7 @@ func main() {
 
 		// Shutdown server
 		s := <-stopCh
-		logger.Infof("got signal '%v', attempting graceful shutdown", s)
+		logger.Infof("Got signal '%v', attempting graceful shutdown", s)
 		shutdown()
 		closeDBConnection()
 		logger.Info("Gracefully shutting down...")
