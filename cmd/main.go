@@ -27,7 +27,7 @@ func main() {
 	db, closeDBConnection := createDBConnection(config.DB, logger)
 
 	stopCh := make(chan os.Signal, 1)
-	signal.Notify(stopCh, syscall.SIGINT)
+	signal.Notify(stopCh, syscall.SIGINT, syscall.SIGTERM)
 
 	if *apiType == "rest" {
 		// TODO
