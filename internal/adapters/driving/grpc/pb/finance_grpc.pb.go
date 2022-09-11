@@ -27,7 +27,7 @@ type FinanceServiceClient interface {
 	Deposit(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionResponse, error)
 	Transfer(ctx context.Context, in *TransferRequest, opts ...grpc.CallOption) (*TransferResponse, error)
 	GetBalance(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetBalanceResponse, error)
-	GetOverviewStatement(ctx context.Context, in *OverviewStatmentRequest, opts ...grpc.CallOption) (*OverviewStatementResponse, error)
+	GetOverviewStatement(ctx context.Context, in *OverviewStatementRequest, opts ...grpc.CallOption) (*OverviewStatementResponse, error)
 	GetOverviewMonthlyStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatementResponse, error)
 	GetOverviewAnnualStatement(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OverviewStatementResponse, error)
 }
@@ -76,7 +76,7 @@ func (c *financeServiceClient) GetBalance(ctx context.Context, in *emptypb.Empty
 	return out, nil
 }
 
-func (c *financeServiceClient) GetOverviewStatement(ctx context.Context, in *OverviewStatmentRequest, opts ...grpc.CallOption) (*OverviewStatementResponse, error) {
+func (c *financeServiceClient) GetOverviewStatement(ctx context.Context, in *OverviewStatementRequest, opts ...grpc.CallOption) (*OverviewStatementResponse, error) {
 	out := new(OverviewStatementResponse)
 	err := c.cc.Invoke(ctx, "/FinanceService/GetOverviewStatement", in, out, opts...)
 	if err != nil {
@@ -111,7 +111,7 @@ type FinanceServiceServer interface {
 	Deposit(context.Context, *TransactionRequest) (*TransactionResponse, error)
 	Transfer(context.Context, *TransferRequest) (*TransferResponse, error)
 	GetBalance(context.Context, *emptypb.Empty) (*GetBalanceResponse, error)
-	GetOverviewStatement(context.Context, *OverviewStatmentRequest) (*OverviewStatementResponse, error)
+	GetOverviewStatement(context.Context, *OverviewStatementRequest) (*OverviewStatementResponse, error)
 	GetOverviewMonthlyStatement(context.Context, *emptypb.Empty) (*OverviewStatementResponse, error)
 	GetOverviewAnnualStatement(context.Context, *emptypb.Empty) (*OverviewStatementResponse, error)
 	mustEmbedUnimplementedFinanceServiceServer()
@@ -133,7 +133,7 @@ func (UnimplementedFinanceServiceServer) Transfer(context.Context, *TransferRequ
 func (UnimplementedFinanceServiceServer) GetBalance(context.Context, *emptypb.Empty) (*GetBalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
 }
-func (UnimplementedFinanceServiceServer) GetOverviewStatement(context.Context, *OverviewStatmentRequest) (*OverviewStatementResponse, error) {
+func (UnimplementedFinanceServiceServer) GetOverviewStatement(context.Context, *OverviewStatementRequest) (*OverviewStatementResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOverviewStatement not implemented")
 }
 func (UnimplementedFinanceServiceServer) GetOverviewMonthlyStatement(context.Context, *emptypb.Empty) (*OverviewStatementResponse, error) {
@@ -228,7 +228,7 @@ func _FinanceService_GetBalance_Handler(srv interface{}, ctx context.Context, de
 }
 
 func _FinanceService_GetOverviewStatement_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OverviewStatmentRequest)
+	in := new(OverviewStatementRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func _FinanceService_GetOverviewStatement_Handler(srv interface{}, ctx context.C
 		FullMethod: "/FinanceService/GetOverviewStatement",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FinanceServiceServer).GetOverviewStatement(ctx, req.(*OverviewStatmentRequest))
+		return srv.(FinanceServiceServer).GetOverviewStatement(ctx, req.(*OverviewStatementRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

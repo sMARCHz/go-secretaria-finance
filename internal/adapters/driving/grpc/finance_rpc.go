@@ -92,7 +92,7 @@ func (f *financeServiceServer) GetBalance(ctx context.Context, r *emptypb.Empty)
 	return &pb.GetBalanceResponse{Accounts: accountsBalance}, nil
 }
 
-func (f *financeServiceServer) GetOverviewStatement(ctx context.Context, r *pb.OverviewStatmentRequest) (*pb.OverviewStatementResponse, error) {
+func (f *financeServiceServer) GetOverviewStatement(ctx context.Context, r *pb.OverviewStatementRequest) (*pb.OverviewStatementResponse, error) {
 	req := dto.GetOverviewStatementRequest{
 		From: r.From.AsTime(),
 		To:   r.To.AsTime(),

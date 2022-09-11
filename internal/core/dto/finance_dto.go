@@ -83,12 +83,12 @@ type OverviewStatementSection struct {
 	Entries []CategorizedEntry
 }
 
-func (o OverviewStatementSection) ToProto() *pb.OverviewStatmentSection {
+func (o OverviewStatementSection) ToProto() *pb.OverviewStatementSection {
 	entries := make([]*pb.CategorizedEntry, len(o.Entries))
 	for i, v := range o.Entries {
 		entries[i] = v.ToProto()
 	}
-	return &pb.OverviewStatmentSection{
+	return &pb.OverviewStatementSection{
 		Total:   o.Total,
 		Entries: entries,
 	}

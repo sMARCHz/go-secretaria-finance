@@ -9,7 +9,7 @@ service FinanceService {
     rpc Deposit(TransactionRequest) returns (TransactionResponse){}
     rpc Transfer(TransferRequest) returns (TransferResponse){}
     rpc GetBalance(google.protobuf.Empty) returns (GetBalanceResponse){}
-    rpc GetOverviewStatement(OverviewStatmentRequest) returns (OverviewStatementResponse){}
+    rpc GetOverviewStatement(OverviewStatementRequest) returns (OverviewStatementResponse){}
     rpc GetOverviewMonthlyStatement(google.protobuf.Empty) returns (OverviewStatementResponse){}
     rpc GetOverviewAnnualStatement(google.protobuf.Empty) returns (OverviewStatementResponse){}
 }
@@ -57,7 +57,7 @@ message AccountBalance {
 }
 
 // Overview Statement
-message OverviewStatmentRequest {
+message OverviewStatementRequest {
     google.protobuf.Timestamp from = 1;
     google.protobuf.Timestamp to = 2;
 }
@@ -65,12 +65,12 @@ message OverviewStatmentRequest {
 message OverviewStatementResponse {
     int32 status = 1;
     string error = 2;
-    OverviewStatmentSection revenue = 3;
-    OverviewStatmentSection expense = 4;
+    OverviewStatementSection revenue = 3;
+    OverviewStatementSection expense = 4;
     double profit = 5;
 }
 
-message OverviewStatmentSection {
+message OverviewStatementSection {
     double total = 1;
     repeated CategorizedEntry entries = 2;
 }
@@ -84,12 +84,12 @@ message CategorizedEntry {
 message DetailedStatementResponse {
     int32 status = 1;
     string error = 2;
-    DetailedStatmentSection revenue = 3;
-    DetailedStatmentSection expense = 4;
+    DetailedStatementSection revenue = 3;
+    DetailedStatementSection expense = 4;
     double profit = 5;
 }
 
-message DetailedStatmentSection {
+message DetailedStatementSection {
     double total = 1;
     repeated Entry entries = 2;
 }
