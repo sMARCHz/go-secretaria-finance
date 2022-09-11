@@ -144,6 +144,7 @@ func (f *financeService) GetOverviewStatement(req dto.GetOverviewStatementReques
 			totalRevenue += v.Amount
 			statement["revenue"] = append(statement["revenue"], v)
 		} else {
+			v.Amount = -v.Amount
 			totalExpense += v.Amount
 			statement["expense"] = append(statement["expense"], v)
 		}
