@@ -93,6 +93,10 @@ func (f *financeService) Transfer(req dto.TransferRequest) (*dto.TransferRespons
 	if err != nil {
 		return nil, err
 	}
+	if fromAccount.Balance < req.Amount {
+		f.logger.Error("from_account's balance is less than transfer amount")
+		return nil, errors.UnprocessableEntityServerError("transferer's balance can't be less than the transfer amount")
+	}
 
 	transfer := domain.TransferInput{
 		FromAccountID: fromAccount.AccountID,
