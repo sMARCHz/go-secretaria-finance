@@ -23,9 +23,9 @@ func NewFinanceRepository(db *sqlx.DB, logger logger.Logger) repository.FinanceR
 	}
 }
 
-func (f *financeRepository) GetAccountIDByName(name string) (*int, *errors.AppError) {
-	var accountID int
-	err := f.db.Get(&accountID, "SELECT account_id FROM accounts WHERE name = $1 LIMIT 1", name)
+func (f *financeRepository) GetAccountByName(name string) (*domain.Account, *errors.AppError) {
+	var account domain.Account
+	err := f.db.Get(&account, "SELECT account_id, name, balance, currency, created_at FROM accounts WHERE name = $1 LIMIT 1", name)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			f.logger.Errorf("account not found where name='%v'", name)
@@ -34,7 +34,7 @@ func (f *financeRepository) GetAccountIDByName(name string) (*int, *errors.AppEr
 		f.logger.Error("failed to get accountID: ", err)
 		return nil, errors.InternalServerError("failed to get accountID")
 	}
-	return &accountID, nil
+	return &account, nil
 }
 
 func (f *financeRepository) GetCategoryIDByAbbrNameAndTransactionType(categoryAbbrName string, transactionType string) (*int, *errors.AppError) {

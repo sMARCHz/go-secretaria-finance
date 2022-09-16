@@ -38,18 +38,18 @@ func (f *financeService) Withdraw(req dto.TransactionRequest) (*dto.TransactionR
 		return nil, err
 	}
 
-	accountID, err := f.repository.GetAccountIDByName(req.AccountName)
+	account, err := f.repository.GetAccountByName(req.AccountName)
 	if err != nil {
 		return nil, err
 	}
 
 	transaction := domain.TransactionInput{
-		AccountID:   *accountID,
+		AccountID:   account.AccountID,
 		CategoryID:  *categoryID,
 		Description: req.Description,
 		Amount:      -req.Amount,
 	}
-	account, err := f.repository.Withdraw(transaction)
+	account, err = f.repository.Withdraw(transaction)
 	if err != nil {
 		return nil, err
 	}
@@ -62,18 +62,18 @@ func (f *financeService) Deposit(req dto.TransactionRequest) (*dto.TransactionRe
 		return nil, err
 	}
 
-	accountID, err := f.repository.GetAccountIDByName(req.AccountName)
+	account, err := f.repository.GetAccountByName(req.AccountName)
 	if err != nil {
 		return nil, err
 	}
 
 	transaction := domain.TransactionInput{
-		AccountID:   *accountID,
+		AccountID:   account.AccountID,
 		CategoryID:  *categoryID,
 		Description: req.Description,
 		Amount:      req.Amount,
 	}
-	account, err := f.repository.Deposit(transaction)
+	account, err = f.repository.Deposit(transaction)
 	if err != nil {
 		return nil, err
 	}
@@ -81,22 +81,22 @@ func (f *financeService) Deposit(req dto.TransactionRequest) (*dto.TransactionRe
 }
 
 func (f *financeService) Transfer(req dto.TransferRequest) (*dto.TransferResponse, *errors.AppError) {
-	fromAccountID, err := f.repository.GetAccountIDByName(req.FromAccountName)
+	fromAccount, err := f.repository.GetAccountByName(req.FromAccountName)
 	if err != nil {
 		return nil, err
 	}
-	toAccountID, err := f.repository.GetAccountIDByName(req.ToAccountName)
+	toAccount, err := f.repository.GetAccountByName(req.ToAccountName)
 	if err != nil {
 		return nil, err
 	}
 
 	transfer := domain.TransferInput{
-		FromAccountID: *fromAccountID,
-		ToAccountID:   *toAccountID,
+		FromAccountID: fromAccount.AccountID,
+		ToAccountID:   toAccount.AccountID,
 		Amount:        req.Amount,
 		Description:   req.Description,
 	}
-	fromAccount, err := f.repository.Transfer(transfer)
+	fromAccount, err = f.repository.Transfer(transfer)
 	if err != nil {
 		return nil, err
 	}
