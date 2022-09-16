@@ -58,19 +58,6 @@ func (f *financeRepository) Withdraw(t domain.TransactionInput) (*domain.Account
 		return nil, errors.InternalServerError("failed to begin transaction")
 	}
 
-	// Check if account's balance isn't less than withdrawal amount
-	var balance float64
-	if err := tx.QueryRow("SELECT balance FROM accounts WHERE account_id = $1", t.AccountID).Scan(&balance); err != nil {
-		tx.Rollback()
-		f.logger.Error("failed to get current balance: ", err)
-		return nil, errors.InternalServerError("failed to get current balance")
-	}
-	if balance < -t.Amount {
-		tx.Rollback()
-		f.logger.Error("account's balance is less than withdrawal amount")
-		return nil, errors.UnprocessableEntityServerError("balance can't be less than the withdrawal amount")
-	}
-
 	// Insert entry
 	query := "INSERT INTO entries(account_id, category_id, amount, description) VALUES($1, $2, $3, $4)"
 	if _, err := tx.Exec(query, t.AccountID, t.CategoryID, t.Amount, t.Description); err != nil {

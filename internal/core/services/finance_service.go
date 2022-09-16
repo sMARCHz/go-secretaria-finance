@@ -42,6 +42,10 @@ func (f *financeService) Withdraw(req dto.TransactionRequest) (*dto.TransactionR
 	if err != nil {
 		return nil, err
 	}
+	if account.Balance < req.Amount {
+		f.logger.Error("account's balance is less than withdrawal amount")
+		return nil, errors.UnprocessableEntityServerError("balance can't be less than the withdrawal amount")
+	}
 
 	transaction := domain.TransactionInput{
 		AccountID:   account.AccountID,
